@@ -7,44 +7,75 @@ import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIOptions;
 import com.sun.jna.Native;
 
+import java.time.Duration;
+import java.time.LocalDate;
+
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.awt.*;
+import java.util.Timer;
 
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
-        usr32();
-        }
-    public static void usr32() {
-        try {
-            Thread.sleep(3000);
-        }
-        catch (InterruptedException e){
-            System.out.println("interrupted");
+
+        processus();
         }
 
+    public static void processus() {
+        String old_window = get_processus();
+        String new_window = old_window;
+
+        while (true) {
+            if (new_window.contains(" - ")){
+                String[] parts = new_window.split(" - ");
+                String NomApp = parts[parts.length-1];
+                System.out.printf("\nApp: " + NomApp);
+            }
+            else{
+                System.out.printf("\nApp: " + new_window);
+
+            };
+
+            LocalDateTime heure_depart = LocalDateTime.now();
+            System.out.printf("\n Depart :"+heure_depart.toString());
+
+            while (new_window.equals(old_window)) {
+                old_window = new_window;
+                new_window = get_processus();
+                // recupere le dernier element si il y a -
+
+                try{
+                    Thread.sleep(1000);
+                }catch (InterruptedException e){
+                    System.out.printf("error" + e);
+                }
+            }
+            // Heure d'arrivé
+            LocalDateTime heure_fin = LocalDateTime.now();
+            System.out.printf("\nFin :"+heure_fin.toString());
+
+            Duration duration = Duration.between(heure_depart,heure_fin);
+            System.out.printf("\nTemps :" + duration.toSeconds());
+            old_window = get_processus();
+            new_window = old_window;
+        }
+
+    }
+
+    private static String get_processus() {
         int nMax_Count = 100;
-        char[] lpString = new char[nMax_Count] ;
-        // Recuperer l'adresse mémoire du processus (fenetre) focus
+        char[] window_char = new char[nMax_Count];
+
         HWND hWnd = User32.INSTANCE.GetForegroundWindow();
         // recupere le nmb de caractre et les stock dans lpstring
-       int window = User32.INSTANCE.GetWindowText( hWnd, lpString, nMax_Count);
-       // convertie lpstring en string
-        String lpStrings = String.valueOf(lpString,0,window);
-        System.out.printf("App: " + lpStrings);
-
-        if (lpStrings.contains(" - ")){
-            String[] parts = lpStrings.split(" - ");
-            String NomApp = parts[parts.length-1];
-            System.out.printf("App: " + NomApp);
-        };
+        int window = User32.INSTANCE.GetWindowText( hWnd, window_char, nMax_Count);
+        // convertie lpstring en string
+        return String.valueOf(window_char,0,window);
     }
+
 
 }
 
