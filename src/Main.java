@@ -1,26 +1,21 @@
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.io.FileWriter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.jna.platform.win32.*;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.win32.StdCallLibrary;
-import com.sun.jna.win32.W32APIOptions;
 import com.sun.jna.Native;
 
 import java.awt.image.BufferedImage;
 import java.time.Duration;
-import java.time.LocalDate;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.awt.*;
-import java.util.Timer;
 
 import java.io.*;
-import java.util.logging.Handler;
+import java.util.HashMap;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -31,52 +26,62 @@ public class Main {
     public static void main(String[] args) {
 
         processus();
-        }
+
+    }
 
     public static void processus() {
         String old_window = GetProcessus();
         String new_window = old_window;
 
         while (true) {
-            if (new_window.contains(" - ")){
+            if (new_window.contains(" - ")) {
                 String[] parts = new_window.split(" - ");
-                String NomApp = parts[parts.length-1];
+                String NomApp = parts[parts.length - 1];
                 System.out.printf("\nApp: " + NomApp + "\n");
-            }
-            else{
+            } else {
                 System.out.printf("\nApp: " + new_window + "\n");
 
             };
 
+            String Date = java.time.LocalDate.now().toString();
+            System.out.printf("\n Date : "+ Date + "\n");
+
             LocalDateTime heure_depart = LocalDateTime.now();
-            System.out.printf("\n Depart : "+heure_depart.toString());
+            System.out.printf("\n Depart : " + heure_depart.toString());
 
             while (new_window.equals(old_window)) {
+                // recupere le dernier element si il y'en a un
                 old_window = new_window;
                 new_window = GetProcessus();
-                // recupere le dernier element si il y a -
 
-                try{
+
+                try {
                     Thread.sleep(500);
-                }catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     System.out.printf("error" + e);
                 }
             }
+            ;
             // Heure d'arrivé
             LocalDateTime heure_fin = LocalDateTime.now();
-            System.out.printf("\n Fin : "+heure_fin.toString());
+            System.out.printf("\n Fin : " + heure_fin.toString());
 
-            Duration duration = Duration.between(heure_depart,heure_fin);
+            Duration duration = Duration.between(heure_depart, heure_fin);
             System.out.printf("\n Temps : " + duration.toSeconds() + " Second\n");
+            String Times = "\n Temps : " + duration.toSeconds() + " Second\n";
             old_window = GetProcessus();
             new_window = old_window;
 
-            System.out.printf("\n path : "+ GetPath() + "\n");
+            System.out.printf("\n path : " + GetPath() + "\n");
             GetIcon();
             GetIconAndSave();
+            Json();
             System.out.printf("\n----------------------\n");
+
         }
-    }
+    };
+
+
 
     private static String GetProcessus() {
         int nMax_Count = 100;
@@ -84,12 +89,23 @@ public class Main {
         // recupere l'adresse memoire
         HWND hWnd = User32.INSTANCE.GetForegroundWindow();
         // recupere le nmb de caractre et les stock dans lpstring
-        int window = User32.INSTANCE.GetWindowText( hWnd, window_char, nMax_Count);
+        int window = User32.INSTANCE.GetWindowText(hWnd, window_char, nMax_Count);
 
 
         // convertie lpstring en string
-        return String.valueOf(window_char,0,window);
+       String ProcessName =  String.valueOf(window_char, 0, window);
+
+        if (ProcessName.contains(" - ")) {
+            String[] parts = ProcessName.split(" - ");
+            String NomApp = parts[parts.length - 1];
+           return NomApp;
+        } else {
+            return ProcessName;
+
+        }
     }
+
+    ;
 
     public static String GetIconAndSave() {
         //  Récupérer l'icône
@@ -101,9 +117,10 @@ public class Main {
         Icon icon = FileSystemView.getFileSystemView()
                 .getSystemIcon(new File(exePath));
 
-        if (new File(iconPath).exists()){
+        if (new File(iconPath).exists()) {
             return iconPath;
         }
+        ;
 
         // Convertir Icon -> BufferedImage
         BufferedImage bufferedImage = new BufferedImage(
@@ -124,31 +141,35 @@ public class Main {
             e.printStackTrace();
             return null;
         }
+        ;
 
-        // 5. Retourner le chemin pour la DB
         return iconPath;
     }
 
-    private static  String GetPath() {
-      HWND hwnd = User32.INSTANCE.GetForegroundWindow();
+    ;
 
-      // Recupere l'id du (pid) du processus
+    private static String GetPath() {
+        HWND hwnd = User32.INSTANCE.GetForegroundWindow();
+
+        // Recupere l'id du (pid) du processus
         IntByReference pid = new IntByReference();
-        User32.INSTANCE.GetWindowThreadProcessId(hwnd,pid);
+        User32.INSTANCE.GetWindowThreadProcessId(hwnd, pid);
 
-      // ouvre le processus
-      WinNT.HANDLE hProcess = Kernel32.INSTANCE.OpenProcess(0x0400 | 0x0010,false,pid.getValue());
+        // ouvre le processus
+        WinNT.HANDLE hProcess = Kernel32.INSTANCE.OpenProcess(0x0400 | 0x0010, false, pid.getValue());
 
-      // Obtient le chemin du processus
+        // Obtient le chemin du processus
         char[] path = new char[1024];
         IntByReference size = new IntByReference(1024);
-        Kernel32.INSTANCE.QueryFullProcessImageName(hProcess,0,path,size);
+        Kernel32.INSTANCE.QueryFullProcessImageName(hProcess, 0, path, size);
         Kernel32.INSTANCE.CloseHandle(hProcess);
 
         return Native.toString(path);
     }
 
-    public static void  GetIcon (){
+    ;
+
+    public static void GetIcon() {
         Icon icon = FileSystemView.getFileSystemView()
                 .getSystemIcon(new File(GetPath()));
 
@@ -159,21 +180,61 @@ public class Main {
         frame.setVisible(true);
     }
 
-    public static void Json() throws IOException {
-        // Créer le json
+    ;
+
+    public static void Json() {
+
+        // Heure de depart
+        LocalDateTime heure_depart = LocalDateTime.now();
+
+
+        // Heure d'arrivé
+        LocalDateTime heure_fin = LocalDateTime.now();
+
+
+        Duration duration = Duration.between(heure_depart, heure_fin);
+
+        String Date = java.time.LocalDate.now().toString();
         String iconPath = GetIconAndSave();
+        String Path = GetPath();
+        String Process_Name = GetProcessus();
+
+        // Arboressance du json
+       Map<String, Map<String,  Map<String,String>>> m = new HashMap<>();
+        Map<String,String>details = new HashMap<>();
+        Map<String, Map<String, String>>App = new HashMap();
+
+        m.put(Date,App);
+        App.put(Process_Name,details);
+        details.put("Time",duration.toString() + "Seconds");
+        details.put("IconPath",iconPath);
+        details.put("Path",Path);
 
 
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-
-        try{
-            new File("Db").mkdirs();
-
-        }catch (Exception e){
+        new File("db").mkdirs();
+        File file = new File("db/User.json");
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        }catch (IOException e) {
             e.printStackTrace();
-            return ;
-        }
+            System.out.print("Erreur lors de la creation du Fichier User.json");
+        };
+            if (file.exists()) {
+                System.out.println(Path);
+            }
 
-    }
-}
+            try( FileWriter writer = new FileWriter("db/User.json")) {
+                writer.write(gson.toJson(m));
 
+
+            }catch (IOException a){
+                a.printStackTrace();
+                System.out.print("Impossible D'ecrire dans le json");
+            }
+    };
+
+};
