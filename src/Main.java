@@ -2,12 +2,14 @@ import java.io.IOException;
 import java.io.FileWriter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.sun.jna.platform.win32.*;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.Native;
 
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Type;
 import java.time.Duration;
 
 import java.time.LocalDateTime;
@@ -69,13 +71,13 @@ public class Main {
             Duration duration = Duration.between(heure_depart, heure_fin);
             System.out.printf("\n Temps : " + duration.toSeconds() + " Second\n");
             String Times = "\n Temps : " + duration.toSeconds() + " Second\n";
+            Json(Times);
             old_window = GetProcessus();
             new_window = old_window;
 
             System.out.printf("\n path : " + GetPath() + "\n");
             GetIcon();
             GetIconAndSave();
-            Json();
             System.out.printf("\n----------------------\n");
 
         }
@@ -182,17 +184,9 @@ public class Main {
 
     ;
 
-    public static void Json() {
+    public static void Json(String Times) {
 
-        // Heure de depart
-        LocalDateTime heure_depart = LocalDateTime.now();
-
-
-        // Heure d'arrivé
-        LocalDateTime heure_fin = LocalDateTime.now();
-
-
-        Duration duration = Duration.between(heure_depart, heure_fin);
+        //Duration Time = processus();
 
         String Date = java.time.LocalDate.now().toString();
         String iconPath = GetIconAndSave();
@@ -200,21 +194,38 @@ public class Main {
         String Process_Name = GetProcessus();
 
         // Arboressance du json
-       Map<String, Map<String,  Map<String,String>>> m = new HashMap<>();
+       Map<String, Map<String,  Map<String, String>>> m = new HashMap<>();
+       File file = new File("db/User.json");
+
         Map<String,String>details = new HashMap<>();
         Map<String, Map<String, String>>App = new HashMap();
 
-        m.put(Date,App);
-        App.put(Process_Name,details);
-        details.put("Time",duration.toString() + "Seconds");
+
+        details.put("Time",Times );
         details.put("IconPath",iconPath);
         details.put("Path",Path);
 
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        new File("db").mkdirs();
-        File file = new File("db/User.json");
+        if (file.exists()) {
+            try( FileReader reader = new FileReader(file)){
+                Type type = new TypeToken<Map<String, Map<String, Map<String, String>>>>(){}.getType();
+                Map<String, Map<String, Map<String, String>>> existing = gson.fromJson(reader, type);
+                
+                if (existing != null){
+                    m.putAll(existing);
+                }
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (m.containsKey(Date)){
+            App = m.get(Date);
+        }
+        m.put(Date,App);
+        App.put(Process_Name,details);
+
         try {
             if (!file.exists()) {
                 file.createNewFile();
@@ -223,18 +234,19 @@ public class Main {
             e.printStackTrace();
             System.out.print("Erreur lors de la creation du Fichier User.json");
         };
-            if (file.exists()) {
-                System.out.println(Path);
-            }
+        if (file.exists()) {
+            System.out.println(Path);
+        }
 
-            try( FileWriter writer = new FileWriter("db/User.json")) {
-                writer.write(gson.toJson(m));
+        try( FileWriter writer = new FileWriter("db/User.json")) {
+            writer.write(gson.toJson(m));
 
 
-            }catch (IOException a){
-                a.printStackTrace();
-                System.out.print("Impossible D'ecrire dans le json");
-            }
+        }catch (IOException a){
+            a.printStackTrace();
+            System.out.print("Impossible D'ecrire dans le json");
+        }
+
     };
 
 };
