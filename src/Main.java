@@ -70,8 +70,9 @@ public class Main {
 
             Duration duration = Duration.between(heure_depart, heure_fin);
             System.out.printf("\n Temps : " + duration.toSeconds() + " Second\n");
-            String Times = "\n Temps : " + duration.toSeconds() + " Second\n";
-            Json(Times);
+            long Times = duration.toSeconds();
+            int nbApp = json.Json(String.valueOf(Times),new_window,GetIconAndSave());
+            System.out.println("Number of app: "+ nbApp);
             old_window = GetProcessus();
             new_window = old_window;
 
@@ -85,7 +86,7 @@ public class Main {
 
 
 
-    private static String GetProcessus() {
+    public static String GetProcessus() {
         int nMax_Count = 100;
         char[] window_char = new char[nMax_Count];
         // recupere l'adresse memoire
@@ -150,7 +151,7 @@ public class Main {
 
     ;
 
-    private static String GetPath() {
+    static String GetPath() {
         HWND hwnd = User32.INSTANCE.GetForegroundWindow();
 
         // Recupere l'id du (pid) du processus
@@ -181,72 +182,5 @@ public class Main {
         frame.pack();
         frame.setVisible(true);
     }
-
-    ;
-
-    public static void Json(String Times) {
-
-        //Duration Time = processus();
-
-        String Date = java.time.LocalDate.now().toString();
-        String iconPath = GetIconAndSave();
-        String Path = GetPath();
-        String Process_Name = GetProcessus();
-
-        // Arboressance du json
-       Map<String, Map<String,  Map<String, String>>> m = new HashMap<>();
-       File file = new File("db/User.json");
-
-        Map<String,String>details = new HashMap<>();
-        Map<String, Map<String, String>>App = new HashMap();
-
-
-        details.put("Time",Times );
-        details.put("IconPath",iconPath);
-        details.put("Path",Path);
-
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        if (file.exists()) {
-            try( FileReader reader = new FileReader(file)){
-                Type type = new TypeToken<Map<String, Map<String, Map<String, String>>>>(){}.getType();
-                Map<String, Map<String, Map<String, String>>> existing = gson.fromJson(reader, type);
-                
-                if (existing != null){
-                    m.putAll(existing);
-                }
-            }catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (m.containsKey(Date)){
-            App = m.get(Date);
-        }
-        m.put(Date,App);
-        App.put(Process_Name,details);
-
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-        }catch (IOException e) {
-            e.printStackTrace();
-            System.out.print("Erreur lors de la creation du Fichier User.json");
-        };
-        if (file.exists()) {
-            System.out.println(Path);
-        }
-
-        try( FileWriter writer = new FileWriter("db/User.json")) {
-            writer.write(gson.toJson(m));
-
-
-        }catch (IOException a){
-            a.printStackTrace();
-            System.out.print("Impossible D'ecrire dans le json");
-        }
-
-    };
-
 };
+

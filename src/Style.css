@@ -1,0 +1,72 @@
+.card {
+    -fx-background-color: #2a2d30;
+    -fx-background-radius: 10;
+    -fx-border-color:  #3a3d40;
+    -fx-border-radius: 10;
+}
+
+.txt {
+    -fx-text-fill: #6b7280;
+}
+
+.alignment {
+    -fx-padding: 10;
+}
+
+.app1 {
+    -fx-text-fill: #3b82f6;
+}
+
+.app2 {
+    -fx-text-fill: #8b5cf6;
+}
+.app3 {
+    -fx-text-fill: #10b981;
+}
+.app4 {
+    -fx-text-fill: #ef4444;
+}
+.app5 {
+    -fx-text-fill: #e8eaed;
+}
+
+.total_time {
+    -fx-text-fill: #60a5fa;
+    -fx-padding: 20;
+}
+
+.application {
+    -fx-text-fill: #34d399;
+    -fx-padding: 20;
+
+}
+
+.main_app {
+    -fx-text-fill: #fbbf24;
+    -fx-padding: 20;
+
+}
+
+.time {
+    -fx-text-fill: #a0aab4;
+}
+
+.chart-plot-background {
+    -fx-background-color: #23262a;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: #3a3d40;
+}
+
+
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: #4a5568;
+    -fx-stroke-dash-array: 8 4;
+    -fx-stroke-width: 1;
+}
+
+.default-color0.chart-bar { -fx-bar-fill: #3b82f6; }
+.default-color1.chart-bar { -fx-bar-fill: #8b5cf6; }
+.default-color2.chart-bar { -fx-bar-fill: #10b981; }
