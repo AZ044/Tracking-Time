@@ -32,3 +32,6 @@ bin/
 
 icons/
 Db/
+db/
+target/
+out/

@@ -77,7 +77,6 @@ public class Main {
             new_window = old_window;
 
             System.out.printf("\n path : " + GetPath() + "\n");
-            GetIcon();
             GetIconAndSave();
             System.out.printf("\n----------------------\n");
 

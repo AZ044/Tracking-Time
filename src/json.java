@@ -31,7 +31,7 @@ public class json {
         File file = new File("db/User.json");
 
         Map<String,String>details = new HashMap<>();
-        Map<String, Map<String, String>>App = new HashMap();
+        Map<String, Map<String, String>>App = new HashMap<>();
 
         int nb = 0;
 
