@@ -2,7 +2,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import javafx.fxml.FXML;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -37,7 +39,7 @@ public class MainController {
   @FXML
   public void initialize() {
     labelDate.setText(LocalDate.now().toString());
-    onRefresh();
+    onRefresh(); // appel direct, sans Platform.runLater
   }
 
   @FXML
@@ -52,6 +54,7 @@ public class MainController {
       totalTime.setText("0h 0m 0s");
       application.setText("0");
       mainApp.setText("-");
+      barChart.getData().clear();
       return;
     }
 
@@ -65,19 +68,43 @@ public class MainController {
       return;
     }
 
+    if (data == null || data.isEmpty()) {
+      resetSlots(names, times, icons);
+      totalTime.setText("0h 0m 0s");
+      application.setText("0");
+      mainApp.setText("-");
+      barChart.getData().clear();
+      return;
+    }
+
     String today = LocalDate.now().toString();
-    Map<String, Map<String, String>> apps = (data == null) ? null : data.get(today);
+    String availableDate = data.containsKey(today)
+            ? today
+            : data.keySet().stream().max(Comparator.naturalOrder()).orElse(null);
+
+    if (availableDate == null) {
+      resetSlots(names, times, icons);
+      totalTime.setText("0h 0m 0s");
+      application.setText("0");
+      mainApp.setText("-");
+      barChart.getData().clear();
+      return;
+    }
+
+    Map<String, Map<String, String>> apps = data.get(availableDate);
+
     if (apps == null || apps.isEmpty()) {
       resetSlots(names, times, icons);
       totalTime.setText("0h 0m 0s");
       application.setText("0");
       mainApp.setText("-");
+      barChart.getData().clear();
       return;
     }
 
     List<Map.Entry<String, Map<String, String>>> sorted = new ArrayList<>(apps.entrySet());
     sorted.sort(Comparator.comparingLong(
-        (Map.Entry<String, Map<String, String>> e) -> parseSeconds(e.getValue().get("Time"))
+            (Map.Entry<String, Map<String, String>> e) -> parseSeconds(e.getValue().get("Time"))
     ).reversed());
 
     long total = 0;
@@ -106,6 +133,41 @@ public class MainController {
     totalTime.setText(formatDuration(total));
     application.setText(String.valueOf(apps.size()));
     mainApp.setText(sorted.get(0).getKey());
+    loadBarChart(apps);
+  }
+
+  private void loadBarChart(Map<String, Map<String, String>> apps) {
+    barChart.setAnimated(false);
+    barChart.getData().clear();
+
+    CategoryAxis xAxis = (CategoryAxis) barChart.getXAxis();
+    xAxis.setAutoRanging(false);
+    xAxis.getCategories().setAll("Today");
+
+    String[] colors = {
+            "#3b82f6", "#8b5cf6", "#10b981", "#ef4444",
+            "#fbbf24", "#f97316", "#06b6d4", "#ec4899"
+    };
+
+    int i = 0;
+    for (Map.Entry<String, Map<String, String>> entry : apps.entrySet()) {
+      String appName = entry.getKey();
+      double hours = parseSeconds(entry.getValue().get("Time")) / 3600.0;
+
+      XYChart.Series<String, Number> series = new XYChart.Series<>();
+      series.setName(appName);
+      XYChart.Data<String, Number> dataPoint = new XYChart.Data<>("Today", hours);
+      series.getData().add(dataPoint);
+      barChart.getData().add(series);
+
+      final String color = colors[i % colors.length];
+      dataPoint.nodeProperty().addListener((obs, oldNode, newNode) -> {
+        if (newNode != null) {
+          newNode.setStyle("-fx-bar-fill: " + color + ";");
+        }
+      });
+      i++;
+    }
   }
 
   private static void resetSlots(Label[] names, Label[] times, ImageView[] icons) {
@@ -129,7 +191,6 @@ public class MainController {
     long h = seconds / 3600;
     long m = (seconds % 3600) / 60;
     long s = seconds % 60;
-    return h + "h " + m + "m" + s + "s";
+    return h + "h " + m + "m " + s + "s";
   }
-
 }

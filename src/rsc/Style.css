@@ -66,7 +66,11 @@
     -fx-stroke-dash-array: 8 4;
     -fx-stroke-width: 1;
 }
-
 .default-color0.chart-bar { -fx-bar-fill: #3b82f6; }
 .default-color1.chart-bar { -fx-bar-fill: #8b5cf6; }
 .default-color2.chart-bar { -fx-bar-fill: #10b981; }
+.default-color3.chart-bar { -fx-bar-fill: #ef4444; }
+.default-color4.chart-bar { -fx-bar-fill: #fbbf24; }
+.default-color5.chart-bar { -fx-bar-fill: #f97316; }
+.default-color6.chart-bar { -fx-bar-fill: #06b6d4; }
+.default-color7.chart-bar { -fx-bar-fill: #ec4899; }

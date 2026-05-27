@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.FileWriter;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -21,6 +22,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
+
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT;
 
@@ -43,10 +45,11 @@ public class Main {
             } else {
                 System.out.printf("\nApp: " + new_window + "\n");
 
-            };
+            }
+            ;
 
             String Date = java.time.LocalDate.now().toString();
-            System.out.printf("\n Date : "+ Date + "\n");
+            System.out.printf("\n Date : " + Date + "\n");
 
             LocalDateTime heure_depart = LocalDateTime.now();
             System.out.printf("\n Depart : " + heure_depart.toString());
@@ -71,8 +74,8 @@ public class Main {
             Duration duration = Duration.between(heure_depart, heure_fin);
             System.out.printf("\n Temps : " + duration.toSeconds() + " Second\n");
             long Times = duration.toSeconds();
-            int nbApp = json.Json(String.valueOf(Times),new_window,GetIconAndSave());
-            System.out.println("Number of app: "+ nbApp);
+            int nbApp = json.Json(String.valueOf(Times), new_window, GetIconAndSave());
+            System.out.println("Number of app: " + nbApp);
             old_window = GetProcessus();
             new_window = old_window;
 
@@ -81,8 +84,9 @@ public class Main {
             System.out.printf("\n----------------------\n");
 
         }
-    };
+    }
 
+    ;
 
 
     public static String GetProcessus() {
@@ -95,12 +99,12 @@ public class Main {
 
 
         // convertie lpstring en string
-       String ProcessName =  String.valueOf(window_char, 0, window);
+        String ProcessName = String.valueOf(window_char, 0, window);
 
         if (ProcessName.contains(" - ")) {
             String[] parts = ProcessName.split(" - ");
             String NomApp = parts[parts.length - 1];
-           return NomApp;
+            return NomApp;
         } else {
             return ProcessName;
 

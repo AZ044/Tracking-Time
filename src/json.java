@@ -15,7 +15,6 @@ import java.util.Map;
 public class json {
     public static void main (String[] args) {
 
-
     }
     public static int Json(String Times ,String Name ,String icon) {
 
@@ -67,9 +66,8 @@ public class json {
 
         details.put("IconPath",iconPath);
         details.put("Path",Path);
-
-        m.put(Date,App);
         App.put(Process_Name,details);
+        m.put(Date,App);
 
         try {
             if (!file.exists()) {
