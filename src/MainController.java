@@ -39,7 +39,7 @@ public class MainController {
   @FXML
   public void initialize() {
     labelDate.setText(LocalDate.now().toString());
-    onRefresh(); // appel direct, sans Platform.runLater
+    onRefresh();
   }
 
   @FXML
