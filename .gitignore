@@ -35,3 +35,9 @@ Db/
 db/
 target/
 out/
+
+.idea/
+*.iml
+target/
+db/
+icons/
