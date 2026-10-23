@@ -37,7 +37,7 @@ Prerequisites:
 ### Launch the UI
 
 ```cmd
-cd path\to\projet_Hub
+cd path\to\Tracking-Time
 mvn clean javafx:run
 ```
 
