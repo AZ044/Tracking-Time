@@ -44,7 +44,7 @@ mvn clean javafx:run
 ### Run the tracker (separate terminal)
 
 ```cmd
-cd path\to\projet_Hub
+cd path\to\Tracking-Time
 mvn clean compile
 mvn exec:java -Dexec.mainClass=Main
 ```
